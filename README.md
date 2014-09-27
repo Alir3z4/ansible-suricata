@@ -9,7 +9,7 @@ Role Variables
 --------------
 TODO!
 
-Example Playbook
+Suricata Playbook
 ----------------
 
 TODO!
