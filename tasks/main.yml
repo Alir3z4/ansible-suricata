@@ -28,15 +28,15 @@
 - name: DISABLE - Network sniffing interface offloading
   command: "{{item}} chdir=/opt"
   with_items:
-    - ethtool -K {{sniffing_interface}} tso off
-    - ethtool -K {{sniffing_interface}} gro off
-    - ethtool -K {{sniffing_interface}} lro off
-    - ethtool -K {{sniffing_interface}} gso off
-    - ethtool -K {{sniffing_interface}} rx off
-    - ethtool -K {{sniffing_interface}} tx off
-    - ethtool -K {{sniffing_interface}} sg off
-    - ethtool -K {{sniffing_interface}} rxvlan off
-    - ethtool -K {{sniffing_interface}} txvlan off
+    - ethtool -K {{suricata_sniffing_interface}} tso off
+    - ethtool -K {{suricata_sniffing_interface}} gro off
+    - ethtool -K {{suricata_sniffing_interface}} lro off
+    - ethtool -K {{suricata_sniffing_interface}} gso off
+    - ethtool -K {{suricata_sniffing_interface}} rx off
+    - ethtool -K {{suricata_sniffing_interface}} tx off
+    - ethtool -K {{suricata_sniffing_interface}} sg off
+    - ethtool -K {{suricata_sniffing_interface}} rxvlan off
+    - ethtool -K {{suricata_sniffing_interface}} txvlan off
   ignore_errors: True
   tags:
     - disable-network-offloading

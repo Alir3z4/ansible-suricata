@@ -309,7 +309,7 @@ nflog:
 # af-packet support
 # Set threads to > 1 to use PACKET_FANOUT support
 af-packet:
-  - interface: {{ sniffing_interface }}
+  - interface: {{ suricata_sniffing_interface }}
     # Number of receive threads (>1 will enable experimental flow pinned
     # runmode)
     threads: 1
@@ -820,7 +820,7 @@ mpipe:
 # PF_RING configuration. for use with native PF_RING support
 # for more info see http://www.ntop.org/PF_RING.html
 pfring:
-  - interface: {{ sniffing_interface }}
+  - interface: {{ suricata_sniffing_interface }}
     # Number of receive threads (>1 will enable experimental flow pinned
     # runmode)
     threads: 1
@@ -856,7 +856,7 @@ pfring:
     #threads: 2
 
 pcap:
-  - interface: {{ sniffing_interface }}
+  - interface: {{ suricata_sniffing_interface }}
     # On Linux, pcap will try to use mmaped capture and will use buffer-size
     # as total of memory used by the ring. So set this to something bigger
     # than 1% of your bandwidth.

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+ethtool -K {{ suricata_sniffing_interface }} tso off
+ethtool -K {{ suricata_sniffing_interface }} gro off
+ethtool -K {{ suricata_sniffing_interface }} lro off
+ethtool -K {{ suricata_sniffing_interface }} gso off
+ethtool -K {{ suricata_sniffing_interface }} rx off
+ethtool -K {{ suricata_sniffing_interface }} tx off
+ethtool -K {{ suricata_sniffing_interface }} sg off
+ethtool -K {{ suricata_sniffing_interface }} rxvlan off
+ethtool -K {{ suricata_sniffing_interface }} txvlan off
+{% if suricata_sniffing_interface_type == "10G" %}
+ethtool -N {{ suricata_sniffing_interface }} rx-flow-hash udp4 sdfn
+ethtool -N {{ suricata_sniffing_interface }} rx-flow-hash udp6 sdfn
+ethtool -n {{ suricata_sniffing_interface }} rx-flow-hash udp6
+ethtool -n {{ suricata_sniffing_interface }} rx-flow-hash udp4
+ethtool -C {{ suricata_sniffing_interface }} rx-usecs 1000
+ethtool -C {{ suricata_sniffing_interface }} adaptive-rx off
+{% endif %}
