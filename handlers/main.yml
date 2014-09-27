@@ -1,2 +1,13 @@
 ---
-# handlers file for suricata
+- name: Start Suricata
+  action: shell='start suricata'
+
+
+- name: Stop Suricata
+  action: shell='stop suricata'
+
+
+- name: Restart Suricata
+  action: shell='restart suricata'
+
+
