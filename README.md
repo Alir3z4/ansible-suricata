@@ -1,5 +1,5 @@
-Suricata
-=========
+Ansible Suricata Playbook
+=========================
 
 An Ansible playbook for deploying the Suricata intrusion detection system and
 fetching Snort rules with Oinkmaster.
@@ -28,8 +28,7 @@ BSD
 Author Information
 ------------------
 
-Author: Alireza Savand
-Email: alireza.savand@gmail.com
+Author: Alireza Savand  
 Github: [github.com/Alir3z4][github-account]
 
 
