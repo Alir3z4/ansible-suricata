@@ -97,7 +97,7 @@
 
 
 - cron: name="Add cronjob: Daily - Update oinkmaster ruleset"
-        special_time:daily
+        special_time=daily
         job=/opt/update_oinkmaster_ruleset.sh
   tags:
     - deploy-cronjobs
