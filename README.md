@@ -20,7 +20,7 @@ suricata_rules_dir: /etc/suricata/rules/
 
 From your Ansible's *roles* folder run:
 ```bash
-git submodule add [/]
+git submodule add https://github.com/ajdelgado/ansible-suricata.git suricata
 ```
 
 ## Platforms
