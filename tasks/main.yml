@@ -16,6 +16,7 @@
 - name: Create required directories
   command: 'mkdir -p {{ item }}'
   with_items:
+    - /etc/init
     - "{{ suricata_log_dir }}"
     - "{{ suricata_log_dir }}"
     - "{{ suricata_log_dir_certs }}"
