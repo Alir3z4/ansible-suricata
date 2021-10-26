@@ -19,12 +19,12 @@ List of Variables available to be configure:
 
 
 Below you can find the variables with their default variables.
-```
+```yaml
 suricata_sniffing_interface: eth0
 suricata_sniffing_interface_type: 100M
 suricata_rules_archive_url: http://rules.emergingthreats.net/open/suricata/emerging.rules.tar.gz
 suricata_log_dir: /var/log/suricata/
-suricata_log_dir: /var/log/suricata/files/
+#suricata_log_dir: /var/log/suricata/files/
 suricata_log_dir_certs: /var/log/suricata/certs/
 suricata_rules_dir: /etc/suricata/rules/
 ```
