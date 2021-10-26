@@ -11,7 +11,7 @@
   with_items:
     - suricata
     - oinkmaster
-    - sysv-rc-conf
+    #- sysv-rc-conf
 
 - name: Create required directories
   command: 'mkdir -p {{ item }}'
@@ -49,18 +49,24 @@
     - deploy-packages
 
 
-- name: Check if irqbalance is enabled
-  command: sysv-rc-conf  --list irqbalance
-  register: chkconfig_status
-  tags: disable-network-offloading
+# - name: Check if irqbalance is enabled
+#   command: sysv-rc-conf  --list irqbalance
+#   register: chkconfig_status
+#   tags: disable-network-offloading
 
 
-- name: DISABLE irqbalance if enabled
-  command: chkconfig irqbalance off
-  ignore_errors: True
-  when: chkconfig_status.stdout.find(":on") != -1
-  tags: disable-network-offloading
+# - name: DISABLE irqbalance if enabled
+#   command: chkconfig irqbalance off
+#   ignore_errors: True
+#   when: chkconfig_status.stdout.find(":on") != -1
+#   tags: disable-network-offloading
 
+- name: Ensure irqbalance is disabled
+  systemd:
+    name: irqbalance
+    enabled: no
+    daemon_reload: yes
+    state: stopped
 
 - name: Deploy suricata.yaml
   template:
