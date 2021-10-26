@@ -27,7 +27,7 @@
 
 - name: Create local rules file
   template:
-    src: local.rules
+    src: etc/suricata/local.rules
     dest: "{{ suricata_rules_dir }}/local.rules"
     owner: root
     group: root
