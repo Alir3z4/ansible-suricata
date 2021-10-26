@@ -116,4 +116,13 @@
   tags:
     - deploy-cronjobs
 
+- name: Check if filebeat modules are present
+  stat:
+    path: /etc/filebeat/modules.d/suricata.yml.disabled
+  register: filebeatmodule
 
+- name: Enable filebeat module if installed
+  shell: mv /etc/filebeat/modules.d/suricata.yml.disabled /etc/filebeat/modules.d/suricata.yml -f
+  args:
+    creates: /etc/filebeat/modules.d/suricata.yml
+  when: filebeatmodule.stat.exists
