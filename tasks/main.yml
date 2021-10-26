@@ -31,6 +31,7 @@
 
 - name: DISABLE - Network sniffing interface offloading
   command: "{{item}}"
+  args:
     chdir: /opt
   with_items:
     - ethtool -K {{suricata_sniffing_interface}} tso off
