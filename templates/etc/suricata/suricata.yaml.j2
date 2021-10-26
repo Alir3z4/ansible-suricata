@@ -72,199 +72,6 @@ unix-command:
   enabled: no
   #filename: custom.socket
 
-# Configure the type of alert (and other) logging you would like.
-outputs:
-
-  # a line based alerts log similar to Snort's fast.log
-  - fast:
-      enabled: yes
-      filename: fast.log
-      append: yes
-      #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
-
-  # Extensible Event Format (nicknamed EVE) event log in JSON format
-  - eve-log:
-      enabled: yes
-      type: file #file|syslog|unix_dgram|unix_stream
-      filename: eve.json
-      # the following are valid when type: syslog above
-      #identity: "suricata"
-      #facility: local5
-      #level: Info ## possible levels: Emergency, Alert, Critical,
-                   ## Error, Warning, Notice, Info, Debug
-      types:
-        - alert
-        - http:
-            extended: yes     # enable this for extended logging information
-            # custom allows additional http fields to be included in eve-log
-            # the example below adds three additional fields when uncommented
-            #custom: [Accept-Encoding, Accept-Language, Authorization]
-        - dns
-        - tls:
-            extended: yes     # enable this for extended logging information
-        - files:
-            force-magic: no   # force logging magic on all logged files
-            force-md5: no     # force logging of md5 checksums
-        #- drop
-        - ssh
-
-  # alert output for use with Barnyard2
-  - unified2-alert:
-      enabled: yes
-      filename: unified2.alert
-
-      # File size limit.  Can be specified in kb, mb, gb.  Just a number
-      # is parsed as bytes.
-      #limit: 32mb
-
-      # Sensor ID field of unified2 alerts.
-      #sensor-id: 0
-
-      # HTTP X-Forwarded-For support by adding the unified2 extra header that
-      # will contain the actual client IP address or by overwriting the source
-      # IP address (helpful when inspecting traffic that is being reversed
-      # proxied).
-      xff:
-        enabled: no
-        # Two operation modes are available, "extra-data" and "overwrite". Note
-        # that in the "overwrite" mode, if the reported IP address in the HTTP
-        # X-Forwarded-For header is of a different version of the packet
-        # received, it will fall-back to "extra-data" mode.
-        mode: extra-data
-        # Header name were the actual IP address will be reported, if more than
-        # one IP address is present, the last IP address will be the one taken
-        # into consideration.
-        header: X-Forwarded-For 
-
-  # a line based log of HTTP requests (no alerts)
-  - http-log:
-      enabled: yes
-      filename: http.log
-      append: yes
-      #extended: yes     # enable this for extended logging information
-      #custom: yes       # enabled the custom logging format (defined by customformat)
-      #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
-
-  # a line based log of TLS handshake parameters (no alerts)
-  - tls-log:
-      enabled: no  # Log TLS connections.
-      filename: tls.log # File to store TLS logs.
-      append: yes
-      #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
-      #extended: yes # Log extended information like fingerprint
-      certs-log-dir: certs # directory to store the certificates files
-
-  # a line based log of DNS requests and/or replies (no alerts)
-  - dns-log:
-      enabled: no
-      filename: dns.log
-      append: yes
-      #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
-
-  # a line based log to used with pcap file study.
-  # this module is dedicated to offline pcap parsing (empty output
-  # if used with another kind of input). It can interoperate with
-  # pcap parser like wireshark via the suriwire plugin.
-  - pcap-info:
-      enabled: no
-
-  # Packet log... log packets in pcap format. 2 modes of operation: "normal"
-  # and "sguil".
-  #
-  # In normal mode a pcap file "filename" is created in the default-log-dir,
-  # or are as specified by "dir". In Sguil mode "dir" indicates the base directory.
-  # In this base dir the pcaps are created in th directory structure Sguil expects:
-  #
-  # $sguil-base-dir/YYYY-MM-DD/$filename.<timestamp>
-  #
-  # By default all packets are logged except:
-  # - TCP streams beyond stream.reassembly.depth
-  # - encrypted streams after the key exchange
-  #
-  - pcap-log:
-      enabled:  no
-      filename: log.pcap
-
-      # File size limit.  Can be specified in kb, mb, gb.  Just a number
-      # is parsed as bytes.
-      limit: 1000mb
-
-      # If set to a value will enable ring buffer mode. Will keep Maximum of "max-files" of size "limit"
-      max-files: 2000
-
-      mode: normal # normal or sguil.
-      #sguil-base-dir: /nsm_data/
-      #ts-format: usec # sec or usec second format (default) is filename.sec usec is filename.sec.usec
-      use-stream-depth: no #If set to "yes" packets seen after reaching stream inspection depth are ignored. "no" logs all packets
-
-  # a full alerts log containing much information for signature writers
-  # or for investigating suspected false positives.
-  - alert-debug:
-      enabled: no
-      filename: alert-debug.log
-      append: yes
-      #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
-
-  # alert output to prelude (http://www.prelude-technologies.com/) only
-  # available if Suricata has been compiled with --enable-prelude
-  - alert-prelude:
-      enabled: no
-      profile: suricata
-      log-packet-content: no
-      log-packet-header: yes
-
-  # Stats.log contains data from various counters of the suricata engine.
-  # The interval field (in seconds) tells after how long output will be written
-  # on the log file.
-  - stats:
-      enabled: yes
-      filename: stats.log
-      interval: 8
-
-  # a line based alerts log similar to fast.log into syslog
-  - syslog:
-      enabled: no
-      # reported identity to syslog. If ommited the program name (usually
-      # suricata) will be used.
-      #identity: "suricata"
-      facility: local5
-      #level: Info ## possible levels: Emergency, Alert, Critical,
-                   ## Error, Warning, Notice, Info, Debug
-
-  # a line based information for dropped packets in IPS mode
-  - drop:
-      enabled: no
-      filename: drop.log
-      append: yes
-      #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
-
-  # output module to store extracted files to disk
-  #
-  # The files are stored to the log-dir in a format "file.<id>" where <id> is
-  # an incrementing number starting at 1. For each file "file.<id>" a meta
-  # file "file.<id>.meta" is created.
-  #
-  # File extraction depends on a lot of things to be fully done:
-  # - stream reassembly depth. For optimal results, set this to 0 (unlimited)
-  # - http request / response body sizes. Again set to 0 for optimal results.
-  # - rules that contain the "filestore" keyword.
-  - file-store:
-      enabled: no       # set to yes to enable
-      log-dir: files    # directory to store the files
-      force-magic: no   # force logging magic on all stored files
-      force-md5: no     # force logging of md5 checksums
-      #waldo: file.waldo # waldo file to store the file_id across runs
-
-  # output module to log files tracked in a easily parsable json format
-  - file-log:
-      enabled: no
-      filename: files-json.log
-      append: yes
-      #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
-
-      force-magic: no   # force logging magic on all logged files
-      force-md5: no     # force logging of md5 checksums
-
 # Magic file. The extension .mgc is added to the value here.
 #magic-file: /usr/share/file/magic
 magic-file: /usr/share/file/magic
@@ -783,12 +590,198 @@ logging:
   - console:
       enabled: yes
   - file:
-      enabled: no
+      enabled: yes
       filename: /var/log/suricata.log
-  - syslog:
+  # a line based alerts log similar to Snort's fast.log
+  - fast:
+      enabled: yes
+      filename: fast.log
+      append: yes
+      #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
+
+  # Extensible Event Format (nicknamed EVE) event log in JSON format
+  - eve-log:
+      enabled: yes
+      type: file #file|syslog|unix_dgram|unix_stream
+      filename: eve.json
+      # the following are valid when type: syslog above
+      #identity: "suricata"
+      #facility: local5
+      #level: Info ## possible levels: Emergency, Alert, Critical,
+                   ## Error, Warning, Notice, Info, Debug
+      types:
+        - alert
+        - http:
+            extended: yes     # enable this for extended logging information
+            # custom allows additional http fields to be included in eve-log
+            # the example below adds three additional fields when uncommented
+            #custom: [Accept-Encoding, Accept-Language, Authorization]
+        - dns
+        - tls:
+            extended: yes     # enable this for extended logging information
+        - files:
+            force-magic: no   # force logging magic on all logged files
+            force-md5: no     # force logging of md5 checksums
+        #- drop
+        - ssh
+
+  # alert output for use with Barnyard2
+  - unified2-alert:
+      enabled: yes
+      filename: unified2.alert
+
+      # File size limit.  Can be specified in kb, mb, gb.  Just a number
+      # is parsed as bytes.
+      #limit: 32mb
+
+      # Sensor ID field of unified2 alerts.
+      #sensor-id: 0
+
+      # HTTP X-Forwarded-For support by adding the unified2 extra header that
+      # will contain the actual client IP address or by overwriting the source
+      # IP address (helpful when inspecting traffic that is being reversed
+      # proxied).
+      xff:
+        enabled: no
+        # Two operation modes are available, "extra-data" and "overwrite". Note
+        # that in the "overwrite" mode, if the reported IP address in the HTTP
+        # X-Forwarded-For header is of a different version of the packet
+        # received, it will fall-back to "extra-data" mode.
+        mode: extra-data
+        # Header name were the actual IP address will be reported, if more than
+        # one IP address is present, the last IP address will be the one taken
+        # into consideration.
+        header: X-Forwarded-For 
+
+  # a line based log of HTTP requests (no alerts)
+  - http-log:
+      enabled: yes
+      filename: http.log
+      append: yes
+      #extended: yes     # enable this for extended logging information
+      #custom: yes       # enabled the custom logging format (defined by customformat)
+      #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
+
+  # a line based log of TLS handshake parameters (no alerts)
+  - tls-log:
+      enabled: yes  # Log TLS connections.
+      filename: tls.log # File to store TLS logs.
+      append: yes
+      #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
+      #extended: yes # Log extended information like fingerprint
+      certs-log-dir: certs # directory to store the certificates files
+
+  # a line based log of DNS requests and/or replies (no alerts)
+  - dns-log:
+      enabled: yes
+      filename: dns.log
+      append: yes
+      #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
+
+  # a line based log to used with pcap file study.
+  # this module is dedicated to offline pcap parsing (empty output
+  # if used with another kind of input). It can interoperate with
+  # pcap parser like wireshark via the suriwire plugin.
+  - pcap-info:
       enabled: no
+
+  # Packet log... log packets in pcap format. 2 modes of operation: "normal"
+  # and "sguil".
+  #
+  # In normal mode a pcap file "filename" is created in the default-log-dir,
+  # or are as specified by "dir". In Sguil mode "dir" indicates the base directory.
+  # In this base dir the pcaps are created in th directory structure Sguil expects:
+  #
+  # $sguil-base-dir/YYYY-MM-DD/$filename.<timestamp>
+  #
+  # By default all packets are logged except:
+  # - TCP streams beyond stream.reassembly.depth
+  # - encrypted streams after the key exchange
+  #
+  - pcap-log:
+      enabled:  no
+      filename: log.pcap
+
+      # File size limit.  Can be specified in kb, mb, gb.  Just a number
+      # is parsed as bytes.
+      limit: 1000mb
+
+      # If set to a value will enable ring buffer mode. Will keep Maximum of "max-files" of size "limit"
+      max-files: 2000
+
+      mode: normal # normal or sguil.
+      #sguil-base-dir: /nsm_data/
+      #ts-format: usec # sec or usec second format (default) is filename.sec usec is filename.sec.usec
+      use-stream-depth: no #If set to "yes" packets seen after reaching stream inspection depth are ignored. "no" logs all packets
+
+  # a full alerts log containing much information for signature writers
+  # or for investigating suspected false positives.
+  - alert-debug:
+      enabled: no
+      filename: alert-debug.log
+      append: yes
+      #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
+
+  # alert output to prelude (http://www.prelude-technologies.com/) only
+  # available if Suricata has been compiled with --enable-prelude
+  - alert-prelude:
+      enabled: no
+      profile: suricata
+      log-packet-content: no
+      log-packet-header: yes
+
+  # Stats.log contains data from various counters of the suricata engine.
+  # The interval field (in seconds) tells after how long output will be written
+  # on the log file.
+  - stats:
+      enabled: yes
+      filename: stats.log
+      interval: 8
+
+  # a line based alerts log similar to fast.log into syslog
+  - syslog:
+      enabled: yes
+      # reported identity to syslog. If ommited the program name (usually
+      # suricata) will be used.
+      #identity: "suricata"
       facility: local5
+      #level: Info ## possible levels: Emergency, Alert, Critical,
+                   ## Error, Warning, Notice, Info, Debug
       format: "[%i] <%d> -- "
+
+  # a line based information for dropped packets in IPS mode
+  - drop:
+      enabled: no
+      filename: drop.log
+      append: yes
+      #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
+
+  # output module to store extracted files to disk
+  #
+  # The files are stored to the log-dir in a format "file.<id>" where <id> is
+  # an incrementing number starting at 1. For each file "file.<id>" a meta
+  # file "file.<id>.meta" is created.
+  #
+  # File extraction depends on a lot of things to be fully done:
+  # - stream reassembly depth. For optimal results, set this to 0 (unlimited)
+  # - http request / response body sizes. Again set to 0 for optimal results.
+  # - rules that contain the "filestore" keyword.
+  - file-store:
+      enabled: no       # set to yes to enable
+      log-dir: files    # directory to store the files
+      force-magic: no   # force logging magic on all stored files
+      force-md5: no     # force logging of md5 checksums
+      #waldo: file.waldo # waldo file to store the file_id across runs
+
+  # output module to log files tracked in a easily parsable json format
+  - file-log:
+      enabled: no
+      filename: files-json.log
+      append: yes
+      #filetype: regular # 'regular', 'unix_stream' or 'unix_dgram'
+
+      force-magic: no   # force logging magic on all logged files
+      force-md5: no     # force logging of md5 checksums
 
 # Tilera mpipe configuration. for use on Tilera TILE-Gx.
 mpipe:
