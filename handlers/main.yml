@@ -1,13 +1,15 @@
 ---
 - name: Start Suricata
-  action: shell='start suricata'
-
+  systemd:
+    name: suricata
+    state: started
 
 - name: Stop Suricata
-  action: shell='stop suricata'
-
+  systemd:
+    name: suricata
+    state: stopped
 
 - name: Restart Suricata
-  action: shell='restart suricata'
-
-
+  systemd:
+    name: suricata
+    state: restarted

@@ -102,7 +102,7 @@
   command: 'oinkmaster -C /etc/oinkmaster.conf -o /etc/suricata/rules'
   tags: update-ruleset
   notify:
-    - restart suricata
+    - Restart Suricata
 
 
 - name: Deploy scripts
