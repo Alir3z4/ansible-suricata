@@ -6,7 +6,7 @@
 
 - name: Install required packages
   package: 
-    name: {{ item }}
+    name: "{{ item }}"
     state: latest
   with_items:
     - suricata
