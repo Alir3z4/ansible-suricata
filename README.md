@@ -34,6 +34,7 @@ Dependencies
 -------------
 None!
 
+Tested on Ubuntu focal
 
 License
 -------
@@ -43,8 +44,8 @@ BSD
 Author Information
 ------------------
 
-Author: Alireza Savand  
+Author: Alireza Savand
 Github: [github.com/Alir3z4][github-account]
 
-
-[github-account]: https://github.com/Alir3z4
+Author: Antonio J. Delgado
+Github: [github.com/ajdelgado][github-account]
