@@ -25,7 +25,6 @@
   tags:
     - create-suricata-dirs
 
-
 - name: Creating required files
   command: touch /etc/suricata//threshold.config
   tags:
@@ -49,19 +48,6 @@
   tags:
     - disable-network-offloading
     - deploy-packages
-
-
-# - name: Check if irqbalance is enabled
-#   command: sysv-rc-conf  --list irqbalance
-#   register: chkconfig_status
-#   tags: disable-network-offloading
-
-
-# - name: DISABLE irqbalance if enabled
-#   command: chkconfig irqbalance off
-#   ignore_errors: True
-#   when: chkconfig_status.stdout.find(":on") != -1
-#   tags: disable-network-offloading
 
 - name: Ensure irqbalance is disabled
   systemd:
@@ -88,7 +74,6 @@
     group: root
   tags: deploy-conf
 
-
 - name: Deploy oinkmaster.conf
   template:
     src: etc/oinkmaster.conf.j2
@@ -98,13 +83,11 @@
     group: root
   tags: deploy-confs
 
-
 - name: Updating ruleset
   command: 'oinkmaster -C /etc/oinkmaster.conf -o /etc/suricata/rules'
   tags: update-ruleset
   notify:
     - Restart Suricata
-
 
 - name: Deploy scripts
   template:
@@ -119,14 +102,12 @@
   tags:
     - deploy-cronjobs
 
-
 - cron:
     name: "Add cronjob at reboot - disbale network offload"
     special_time: reboot
     job: "/opt/disable_network_offload.sh"
   tags:
     - deploy-cronjobs
-
 
 - cron:
     name: "Add cronjob: Daily - Update oinkmaster ruleset"
