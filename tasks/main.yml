@@ -25,6 +25,15 @@
   tags:
     - create-suricata-dirs
 
+- name: Create local rules file
+  template:
+    src: local.rules
+    dest: "{{ suricata_rules_dir }}/local.rules"
+    owner: root
+    group: root
+    mode: 0660
+    backup: yes
+
 - name: Creating required files
   command: touch /etc/suricata//threshold.config
   tags:

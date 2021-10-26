@@ -1,0 +1,3 @@
+{% if suricata_local_rules is defined %}{% for rule in suricata_local_rules %}
+{{ rule }}
+{% endfor %}{% endif %}
