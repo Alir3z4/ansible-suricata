@@ -68,10 +68,7 @@ None!
 
 BSD
 
-## Author Information
+## Authors Information
 
-Author: Alireza Savand
-Github: [github.com/Alir3z4][github-account]
-
-Author: Antonio J. Delgado
-Github: [github.com/ajdelgado][github-account]
+* [Alireza Savand](https://github.com/Alir3z4)
+* [Antonio J. Delgado](https://github.com/ajdelgado)
