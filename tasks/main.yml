@@ -1,17 +1,23 @@
 ---
 - name: Add Suricata APT repository
-  apt_repository: repo='ppa:oisf/suricata-stable' state=present
+  apt_repository:
+    repo: 'ppa:oisf/suricata-stable'
+    state: present
 
 - name: Install required packages
-  apt: pkg={{ item }} state=latest
+  package: 
+    name: "{{ item }}"
+    state: latest
   with_items:
-          - suricata
-          - oinkmaster
-          - sysv-rc-conf
+    - suricata
+    - oinkmaster
+    - ethtool
+    #- sysv-rc-conf
 
 - name: Create required directories
   command: 'mkdir -p {{ item }}'
   with_items:
+    - /etc/init
     - "{{ suricata_log_dir }}"
     - "{{ suricata_log_dir }}"
     - "{{ suricata_log_dir_certs }}"
@@ -19,6 +25,14 @@
   tags:
     - create-suricata-dirs
 
+- name: Create local rules file
+  template:
+    src: etc/suricata/local.rules.j2
+    dest: "{{ suricata_rules_dir }}/local.rules"
+    owner: root
+    group: root
+    mode: 0660
+    backup: yes
 
 - name: Creating required files
   command: touch /etc/suricata//threshold.config
@@ -26,7 +40,9 @@
     - create-suricata-files
 
 - name: DISABLE - Network sniffing interface offloading
-  command: "{{item}} chdir=/opt"
+  command: "{{item}}"
+  args:
+    chdir: /opt
   with_items:
     - ethtool -K {{suricata_sniffing_interface}} tso off
     - ethtool -K {{suricata_sniffing_interface}} gro off
@@ -42,64 +58,84 @@
     - disable-network-offloading
     - deploy-packages
 
-
-- name: Check if irqbalance is enabled
-  command: sysv-rc-conf  --list irqbalance
-  register: chkconfig_status
-  tags: disable-network-offloading
-
-
-- name: DISABLE irqbalance if enabled
-  command: chkconfig irqbalance off
-  ignore_errors: True
-  when: chkconfig_status.stdout.find(":on") != -1
-  tags: disable-network-offloading
-
+- name: Ensure irqbalance is disabled
+  systemd:
+    name: irqbalance
+    enabled: no
+    daemon_reload: yes
+    state: stopped
 
 - name: Deploy suricata.yaml
-  template: src=etc/suricata/suricata.yaml.j2 dest=/etc/suricata/suricata.yaml mode=0640 owner=root group=root
+  template:
+    src: etc/suricata/suricata.yaml.j2
+    dest: /etc/suricata/suricata.yaml
+    mode: 0640
+    owner: root
+    group: root
+    backup: yes
   tags: deploy-confs
 
 - name: Deploy Suricata init script
-  template: src=etc/init/suricata.conf.j2 dest=/etc/init/suricata.conf mode=0640 owner=root group=root
+  template:
+    src: etc/init/suricata.conf.j2
+    dest: /etc/init/suricata.conf
+    mode: 0640
+    owner: root
+    group: root
+    backup: yes
   tags: deploy-conf
 
-
 - name: Deploy oinkmaster.conf
-  template: src=etc/oinkmaster.conf.j2 dest=/etc/oinkmaster.conf mode=0640 owner=root group=root
+  template:
+    src: etc/oinkmaster.conf.j2
+    dest: /etc/oinkmaster.conf
+    mode: 0640
+    owner: root
+    group: root
+    backup: yes
   tags: deploy-confs
-
 
 - name: Updating ruleset
   command: 'oinkmaster -C /etc/oinkmaster.conf -o /etc/suricata/rules'
   tags: update-ruleset
   notify:
-    - restart suricata
-
+    - Restart Suricata
 
 - name: Deploy scripts
-  template: src=opt/{{ item }}.sh.j2 dest=/opt/{{ item }}.sh
-            mode=755
-            owner=root
-            group=root
+  template:
+    src: "opt/{{ item }}.sh.j2"
+    dest: "/opt/{{ item }}.sh"
+    mode: 755
+    owner: root
+    group: root
+    backup: yes
   with_items:
     - disable_network_offload
     - update_oinkmaster_ruleset
   tags:
     - deploy-cronjobs
 
-
-- cron: name="Add cronjob at reboot - disbale network offload"
-        special_time=reboot
-        job="/opt/disable_network_offload.sh"
+- cron:
+    name: "Add cronjob at reboot - disbale network offload"
+    special_time: reboot
+    job: "/opt/disable_network_offload.sh"
   tags:
     - deploy-cronjobs
 
-
-- cron: name="Add cronjob: Daily - Update oinkmaster ruleset"
-        special_time=daily
-        job=/opt/update_oinkmaster_ruleset.sh
+- cron:
+    name: "Add cronjob: Daily - Update oinkmaster ruleset"
+    special_time: daily
+    job: /opt/update_oinkmaster_ruleset.sh
   tags:
     - deploy-cronjobs
 
+- name: Check if filebeat modules are present
+  stat:
+    path: /etc/filebeat/modules.d/suricata.yml.disabled
+  register: filebeatmodule
 
+- name: Enable filebeat module if installed
+  shell: mv /etc/filebeat/modules.d/suricata.yml.disabled /etc/filebeat/modules.d/suricata.yml -f
+  args:
+    creates: /etc/filebeat/modules.d/suricata.yml
+  when: filebeatmodule.stat.exists
